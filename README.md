@@ -16,6 +16,22 @@ Clone the template-snap repository [using this template](https://github.com/Meta
 yarn install && yarn start
 ```
 
+## Setup Env
+
+- Use node version 18, e.g. `v18.6.0`
+  ```
+  # Install node version if not installed
+  nvm install 18.6.0
+  nvm use 18.6.0
+  ```
+- Use yarn version 3, e.g. `3.2.1`
+  ```
+  yarn set version 3.2.1
+  ``` 
+References
+https://docs.metamask.io/snaps/get-started/quickstart/
+https://github.com/MetaMask/template-snap-monorepo/blob/main/.nvmrc
+
 ## Cloning
 
 This repository contains GitHub Actions that you may find useful, see `.github/workflows` and [Releasing & Publishing](https://github.com/MetaMask/template-snap-monorepo/edit/main/README.md#releasing--publishing) below for more information.
