@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="289.1311 172.171 36.0059 36.0059" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(-1, -0.000164000026, 0.000164000026, -1, 157.134075018199, 66.173932098027)" style="transform-origin: 150px 124px;">
+    <rect class="clda" width="36" height="36" rx="7" transform="translate(132 106)" style="fill: rgb(228, 255, 1);"/>
+    <g transform="translate(-542.18 -788.245)">
+      <path class="cldb" d="M700.106,917.154H687.2a4.251,4.251,0,0,1-4.251-4.251v-1.258a4.323,4.323,0,0,1,4.31-4.31h16.421v-3.273h-15.71a4.44,4.44,0,0,0-3.243,1.279l-4.761,4.2a3.251,3.251,0,0,0-1.279,2.708,3.214,3.214,0,0,0,1.279,2.708l4.761,4.2a4.563,4.563,0,0,0,3.243,1.28h15.71v-3.273Z" transform="translate(0)" style="fill: rgb(34, 36, 39);"/>
+    </g>
+  </g>
+</svg>
