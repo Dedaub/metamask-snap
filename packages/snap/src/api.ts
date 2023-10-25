@@ -39,13 +39,3 @@ export async function simulateTransaction(transaction: {
     },
   );
 }
-
-/**
- * Fetches the ethereum gas fees.
- *
- * @returns It gets the fees.
- */
-export async function getFees() {
-  const response = await fetch('https://beaconcha.in/api/v1/execution/gasnow');
-  return response.text();
-}
