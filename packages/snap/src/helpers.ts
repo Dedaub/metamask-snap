@@ -1,7 +1,11 @@
 import BigNumber from 'bignumber.js';
+import { chainIdToNetwork } from './constants';
 
 export const mapTokenToData = (tokenAddr: string, tokens: any) => {
   const tokenData = tokens[tokenAddr.toLowerCase()];
+  if (!tokenData) {
+    return {};
+  }
   return {
     symbol: tokenData.symbol,
     name: tokenData.token_name,
@@ -26,7 +30,17 @@ export const calcTokenAmounts = (
 
   return {
     decimalAmount: decimalAmount.toString(),
-    amount: adjustedAmount.toString(),
-    value: adjustedAmount.multipliedBy(lastPrice).toString(),
+    amount:
+      adjustedAmount.toString() === 'NaN' ? 'N/A' : adjustedAmount.toString(),
+    value:
+      adjustedAmount.toString() === 'NaN'
+        ? 'N/A'
+        : adjustedAmount.multipliedBy(lastPrice).toString(),
   };
+};
+
+export const getNetworkName = (chaindId: string): string | false => {
+  const hexChainIdStr = `0x${chaindId.split(':')[1]}`;
+  const decimalChainIdStr = new BigNumber(hexChainIdStr, 16).toString();
+  return chainIdToNetwork.get(decimalChainIdStr) || false;
 };

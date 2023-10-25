@@ -1,15 +1,22 @@
 import { OnTransactionHandler } from '@metamask/snaps-types';
 import { NodeType, Component } from '@metamask/snaps-ui';
 import { simulateTransaction } from './api';
-import { calcTokenAmounts, mapTokenToData } from './helpers';
+import { calcTokenAmounts, getNetworkName, mapTokenToData } from './helpers';
+import { NetworkNotSupportedPanel, TxRevertedPanel } from './panelMessages';
 
 export const onTransaction: OnTransactionHandler = async ({
   transaction,
-  chainId: _chainId,
+  chainId,
   transactionOrigin: _transactionOrigin,
 }) => {
+  const networkName = getNetworkName(chainId);
+
+  if (!networkName) {
+    return NetworkNotSupportedPanel;
+  }
+
   try {
-    const response = await simulateTransaction(transaction);
+    const response = await simulateTransaction(transaction, networkName);
     const payload = await response.json();
     if (!response.ok) {
       throw new Error(payload.detail);
@@ -17,22 +24,7 @@ export const onTransaction: OnTransactionHandler = async ({
     const txReverted = payload.trace_node.children[0]?.opcode === 'REVERT';
 
     if (txReverted) {
-      return {
-        content: {
-          type: NodeType.Panel,
-          children: [
-            {
-              type: NodeType.Heading,
-              value: '⛔ Tx Reverted',
-            },
-            {
-              type: NodeType.Text,
-              value: 'Find the error message from logs',
-            },
-          ],
-        },
-        severity: 'critical',
-      };
+      return TxRevertedPanel;
     }
 
     const assetsOut = payload.token_transfers
