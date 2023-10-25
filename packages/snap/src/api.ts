@@ -14,17 +14,6 @@ export async function simulateTransaction(
   network: string,
 ) {
   const { data, from, gas, to, value } = transaction;
-  console.log(
-    'POSTING:',
-    JSON.stringify({
-      data: data || '0x00',
-      to_a: to,
-      from_a: from,
-      value,
-      gas,
-      block_number: 'latest',
-    }),
-  );
 
   return await fetch(
     `https://api.dedaub.com/api/transaction/${network}/simulate`,
