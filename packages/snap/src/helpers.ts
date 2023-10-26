@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { Json } from '@metamask/snaps-types';
 import { chainIdToNetwork } from './constants';
 
 export const mapTokenToData = (tokenAddr: string, tokens: any) => {
@@ -43,4 +44,15 @@ export const getNetworkName = (chaindId: string): string | false => {
   const hexChainIdStr = `0x${chaindId.split(':')[1]}`;
   const decimalChainIdStr = new BigNumber(hexChainIdStr, 16).toString();
   return chainIdToNetwork.get(decimalChainIdStr) || false;
+};
+
+export const getContractLibrarySimulateUrl = (
+  transaction: {
+    [key: string]: Json;
+  },
+  network: string,
+): string => {
+  const { data, from, gas, to, value } = transaction;
+  const adjustedGas = data ? gas : '0x520C'; // TXs with empty data should have fixed gas to simulate
+  return `https://library.dedaub.com/${network}/tx/0x0/simulate/0?bn=${'latest'}&data=${data}&from=${from}&to=${to}&gas=${adjustedGas}&value=${value}`;
 };

@@ -1,8 +1,17 @@
 import { OnTransactionHandler } from '@metamask/snaps-types';
 import { NodeType, Component } from '@metamask/snaps-ui';
 import { simulateTransaction } from './api';
-import { calcTokenAmounts, getNetworkName, mapTokenToData } from './helpers';
-import { NetworkNotSupportedPanel, TxRevertedPanel } from './panelMessages';
+import {
+  calcTokenAmounts,
+  getContractLibrarySimulateUrl,
+  getNetworkName,
+  mapTokenToData,
+} from './helpers';
+import {
+  NetworkNotSupportedPanel,
+  SimulateLinkToContractLibrary,
+  TxRevertedPanel,
+} from './panelMessages';
 
 export const onTransaction: OnTransactionHandler = async ({
   transaction,
@@ -63,7 +72,7 @@ export const onTransaction: OnTransactionHandler = async ({
         };
       });
 
-    const drawAssetsOut: Component[] =
+    const DrawAssetsOut: Component[] =
       assetsOut.length > 0
         ? assetsOut
             .map((asset: any) => [
@@ -90,7 +99,7 @@ export const onTransaction: OnTransactionHandler = async ({
             type: NodeType.Text,
           };
 
-    const drawAssetsIn: Component[] = assetsIn
+    const DrawAssetsIn: Component[] = assetsIn
       .map((asset: any) => [
         {
           value: `**Symbol: ${asset.symbol}**`,
@@ -108,6 +117,11 @@ export const onTransaction: OnTransactionHandler = async ({
       ])
       .reduce((acc: Component[], value: Component[]) => [...acc, ...value], []);
 
+    const contractLibraryUrl = getContractLibrarySimulateUrl(
+      transaction,
+      networkName,
+    );
+
     return {
       content: {
         type: NodeType.Panel,
@@ -121,7 +135,7 @@ export const onTransaction: OnTransactionHandler = async ({
             type: NodeType.Text,
             markdown: true,
           },
-          ...drawAssetsOut,
+          ...DrawAssetsOut,
           {
             type: NodeType.Divider,
           },
@@ -130,7 +144,8 @@ export const onTransaction: OnTransactionHandler = async ({
             type: NodeType.Text,
             markdown: true,
           },
-          ...drawAssetsIn,
+          ...DrawAssetsIn,
+          ...SimulateLinkToContractLibrary(contractLibraryUrl),
         ],
       },
       severity: 'critical',
