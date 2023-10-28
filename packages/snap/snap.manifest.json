@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Security insights on detecting suspicious interactions.",
   "proposedName": "Dedaub",
   "repository": {
@@ -7,12 +7,12 @@
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "agHW4x15pdYeOJgInGJICgbuMvIX10KA9gyiYXci2UI=",
+    "shasum": "q1r8hRrc3ado3RO83yOR/sJhzEDw4u5L2mZz6GaYZRs=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/dedaubYellow.svg",
-        "packageName": "snap",
+        "packageName": "dedaub-metamask-snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
