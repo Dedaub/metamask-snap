@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { Json } from '@metamask/snaps-types';
+import lzString from 'lz-string';
 import { chainIdToNetwork } from './constants';
 
 export const mapTokenToData = (tokenAddr: string, tokens: any) => {
@@ -54,5 +55,12 @@ export const getContractLibrarySimulateUrl = (
 ): string => {
   const { data, from, gas, to, value } = transaction;
   const adjustedGas = data ? gas : '0x520C'; // TXs with empty data should have fixed gas to simulate
-  return `https://library.dedaub.com/${network}/tx/0x0/simulate/0?bn=${'latest'}&data=${data}&from=${from}&to=${to}&gas=${adjustedGas}&value=${value}`;
+  const encodedData = lzString.compressToEncodedURIComponent(
+    `d=${data?.toString().slice(2) || ''},f=${from?.toString().slice(2)},t=${to
+      ?.toString()
+      .slice(2)},g=${adjustedGas?.toString().slice(2)},v=${value
+      ?.toString()
+      .slice(2)}`,
+  );
+  return `https://library.dedaub.com/${network}/tx/0x0/simulate/0?query=${encodedData}`;
 };
