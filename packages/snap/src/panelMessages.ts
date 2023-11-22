@@ -14,23 +14,52 @@ export const NetworkNotSupportedPanel: OnTransactionResponse = {
   severity: 'critical',
 };
 
-export const TxRevertedPanel: OnTransactionResponse = {
+export const TxRevertedPanel = (errorMsg: string): OnTransactionResponse => ({
   content: {
     type: NodeType.Panel,
     children: [
       {
         type: NodeType.Heading,
-        value: '⛔ Tx Reverted',
+        value: '⛔ Tx Reverted/Threw',
+      },
+      {
+        value: errorMsg,
+        type: NodeType.Text,
       },
     ],
   },
   severity: 'critical',
-};
+});
 
-const MAX_URL_CHARS_LENGTH = 2000;
+const MAX_URL_CHARS_LENGTH = 2048;
+
+export const TxConfidenceVerdict = (
+  verdictMsg: string | undefined,
+): Component[] =>
+  verdictMsg
+    ? [
+        {
+          type: NodeType.Heading,
+          value: verdictMsg,
+        },
+        {
+          type: NodeType.Divider,
+        },
+      ]
+    : [];
+
+export const TxInsights = (insights: any[]): Component[] =>
+  insights?.length > 0
+    ? [
+        {
+          type: NodeType.Divider,
+        },
+        ...insights.map((insight: Component) => insight),
+      ]
+    : [];
 
 export const SimulateLinkToContractLibrary = (url: string): Component[] =>
-  url.length <= MAX_URL_CHARS_LENGTH
+  url.length < MAX_URL_CHARS_LENGTH
     ? [
         {
           type: NodeType.Divider,

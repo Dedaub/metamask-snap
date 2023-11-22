@@ -3,6 +3,22 @@ import { Json } from '@metamask/snaps-types';
 import lzString from 'lz-string';
 import { chainIdToNetwork } from './constants';
 
+export const hasTxReverted = (
+  traceNode: any,
+): { txReverted: boolean; txError: string } => {
+  if (!traceNode?.children) {
+    return { txReverted: false, txError: '' };
+  }
+
+  const childrenLength = traceNode?.children.length;
+  const lastChild = traceNode.children[childrenLength];
+  if (lastChild?.opcode === 'REVERT') {
+    return { txReverted: true, txError: lastChild.error };
+  }
+
+  return { txReverted: false, txError: '' };
+};
+
 export const mapTokenToData = (tokenAddr: string, tokens: any) => {
   const tokenData = tokens[tokenAddr.toLowerCase()];
   if (!tokenData) {
@@ -33,11 +49,11 @@ export const calcTokenAmounts = (
   return {
     decimalAmount: decimalAmount.toString(),
     amount:
-      adjustedAmount.toString() === 'NaN' ? 'N/A' : adjustedAmount.toString(),
+      adjustedAmount.toString() === 'NaN' ? 'N/A' : adjustedAmount.toFixed(4),
     value:
       adjustedAmount.toString() === 'NaN'
         ? 'N/A'
-        : adjustedAmount.multipliedBy(lastPrice).toString(),
+        : adjustedAmount.multipliedBy(lastPrice).toFixed(2),
   };
 };
 

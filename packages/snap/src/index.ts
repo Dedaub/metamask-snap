@@ -5,13 +5,17 @@ import {
   calcTokenAmounts,
   getContractLibrarySimulateUrl,
   getNetworkName,
+  hasTxReverted,
   mapTokenToData,
 } from './helpers';
 import {
   NetworkNotSupportedPanel,
   SimulateLinkToContractLibrary,
+  TxConfidenceVerdict,
+  TxInsights,
   TxRevertedPanel,
 } from './panelMessages';
+import { SnapSimulateResponse } from './types/SnapSimulateResponse';
 
 export const onTransaction: OnTransactionHandler = async ({
   transaction,
@@ -24,134 +28,15 @@ export const onTransaction: OnTransactionHandler = async ({
     return NetworkNotSupportedPanel;
   }
 
+  let payload: SnapSimulateResponse;
+
   try {
     const response = await simulateTransaction(transaction, networkName);
-    const payload = await response.json();
+    payload = await response.json();
     if (!response.ok) {
-      throw new Error(payload.detail);
+      throw new Error('An error occurred. Please try again later');
     }
-    const txReverted = payload.trace_node.children[0]?.opcode === 'REVERT';
-
-    if (txReverted) {
-      return TxRevertedPanel;
-    }
-
-    const assetsOut = payload.token_transfers
-      .filter(
-        (tokenTransfer: any) =>
-          tokenTransfer.from_a.toLowerCase() === transaction.from,
-      )
-      .map((tokenTransfer: any) => {
-        const tokenData = mapTokenToData(tokenTransfer.address, payload.tokens);
-        return {
-          ...tokenTransfer,
-          ...tokenData,
-          ...calcTokenAmounts(
-            tokenTransfer.amount,
-            tokenData.decimals,
-            tokenData.lastPrice,
-          ),
-        };
-      });
-
-    const assetsIn = payload.token_transfers
-      .filter(
-        (tokenTransfer: any) =>
-          tokenTransfer.to_a.toLowerCase() === transaction.from,
-      )
-      .map((tokenTransfer: any) => {
-        const tokenData = mapTokenToData(tokenTransfer.address, payload.tokens);
-        return {
-          ...tokenTransfer,
-          ...tokenData,
-          ...calcTokenAmounts(
-            tokenTransfer.amount,
-            tokenData.decimals,
-            tokenData.lastPrice,
-          ),
-        };
-      });
-
-    const DrawAssetsOut: Component[] =
-      assetsOut.length > 0
-        ? assetsOut
-            .map((asset: any) => [
-              {
-                value: `**Symbol: ${asset.symbol}**`,
-                type: NodeType.Text,
-                markdown: true,
-              },
-              {
-                value: `Name: ${asset.name}`,
-                type: NodeType.Text,
-              },
-              {
-                value: `Transfer: - ${asset.amount} (≈ $${asset.value})`,
-                type: NodeType.Text,
-              },
-            ])
-            .reduce(
-              (acc: Component[], value: Component[]) => [...acc, ...value],
-              [],
-            )
-        : {
-            value: 'No inbound assets',
-            type: NodeType.Text,
-          };
-
-    const DrawAssetsIn: Component[] = assetsIn
-      .map((asset: any) => [
-        {
-          value: `**Symbol: ${asset.symbol}**`,
-          type: NodeType.Text,
-          markdown: true,
-        },
-        {
-          value: `Name: ${asset.name}`,
-          type: NodeType.Text,
-        },
-        {
-          value: `Transfer: + ${asset.amount} (≈ $${asset.value})`,
-          type: NodeType.Text,
-        },
-      ])
-      .reduce((acc: Component[], value: Component[]) => [...acc, ...value], []);
-
-    const contractLibraryUrl = getContractLibrarySimulateUrl(
-      transaction,
-      networkName,
-    );
-
-    return {
-      content: {
-        type: NodeType.Panel,
-        children: [
-          {
-            type: NodeType.Heading,
-            value: '⚖️ Asset Balances:',
-          },
-          {
-            value: '**⚠️ Assets out**',
-            type: NodeType.Text,
-            markdown: true,
-          },
-          ...DrawAssetsOut,
-          {
-            type: NodeType.Divider,
-          },
-          {
-            value: '**✅ Assets in**',
-            type: NodeType.Text,
-            markdown: true,
-          },
-          ...DrawAssetsIn,
-          ...SimulateLinkToContractLibrary(contractLibraryUrl),
-        ],
-      },
-      severity: 'critical',
-    };
   } catch (error) {
-    console.log('ERROR tx simulate', error);
     return {
       content: {
         type: NodeType.Panel,
@@ -169,4 +54,146 @@ export const onTransaction: OnTransactionHandler = async ({
       severity: 'critical',
     };
   }
+
+  const { simulate, verdict, insights } = payload;
+
+  const { txReverted, txError } = hasTxReverted(simulate.trace_node);
+
+  if (txReverted) {
+    return TxRevertedPanel(txError);
+  }
+
+  const assetsOut = simulate.balance_deltas
+    .filter(
+      (balanceDelta) => balanceDelta.address.toLowerCase() === transaction.from,
+    )
+    .filter((balanceDelta: any) => balanceDelta.balance.startsWith('-0x')) // keep negative values
+    .map((balanceDelta: any) => ({
+      ...balanceDelta,
+      balance: balanceDelta.balance.slice(1), // remove '-' prefix
+    }))
+    .map((balanceDelta: any) => {
+      const tokenData = mapTokenToData(balanceDelta.token, simulate.tokens);
+      return {
+        ...balanceDelta,
+        ...tokenData,
+        ...calcTokenAmounts(
+          balanceDelta.balance,
+          tokenData.decimals,
+          tokenData.lastPrice,
+        ),
+      };
+    });
+
+  const assetsIn = simulate.balance_deltas
+    .filter(
+      (balanceDelta) => balanceDelta.address.toLowerCase() === transaction.from,
+    )
+    .filter((balanceDelta: any) => balanceDelta.balance.startsWith('0x')) // keep positive values
+    .map((balanceDelta: any) => {
+      const tokenData = mapTokenToData(balanceDelta.token, simulate.tokens);
+      return {
+        ...balanceDelta,
+        ...tokenData,
+        ...calcTokenAmounts(
+          balanceDelta.balance,
+          tokenData.decimals,
+          tokenData.lastPrice,
+        ),
+      };
+    });
+
+  const DrawAssetsOut: Component[] =
+    assetsOut.length > 0
+      ? assetsOut
+          .map<Component[]>((asset) => [
+            {
+              value: `**Symbol: ${asset.symbol}**`,
+              type: NodeType.Text,
+              markdown: true,
+            },
+            {
+              value: `Name: ${asset.name}`,
+              type: NodeType.Text,
+            },
+            {
+              value: `Transfer: - ${asset.amount} (≈ $${asset.value})`,
+              type: NodeType.Text,
+            },
+          ])
+          .reduce(
+            (acc: Component[], value: Component[]) => [...acc, ...value],
+            [],
+          )
+      : [
+          {
+            value: 'No outbound assets',
+            type: NodeType.Text,
+          },
+        ];
+
+  const DrawAssetsIn: Component[] =
+    assetsIn.length > 0
+      ? assetsIn
+          .map<Component[]>((asset: any) => [
+            {
+              value: `**Symbol: ${asset.symbol}**`,
+              type: NodeType.Text,
+              markdown: true,
+            },
+            {
+              value: `Name: ${asset.name}`,
+              type: NodeType.Text,
+            },
+            {
+              value: `Transfer: + ${asset.amount} (≈ $${asset.value})`,
+              type: NodeType.Text,
+            },
+          ])
+          .reduce(
+            (acc: Component[], value: Component[]) => [...acc, ...value],
+            [],
+          )
+      : [
+          {
+            value: 'No inbound assets',
+            type: NodeType.Text,
+          },
+        ];
+
+  const contractLibraryUrl = getContractLibrarySimulateUrl(
+    transaction,
+    networkName,
+  );
+
+  return {
+    content: {
+      type: NodeType.Panel,
+      children: [
+        ...TxConfidenceVerdict(verdict),
+        {
+          type: NodeType.Heading,
+          value: '⚖️ Asset Balances:',
+        },
+        {
+          value: '**⚠️ Assets out**',
+          type: NodeType.Text,
+          markdown: true,
+        },
+        ...DrawAssetsOut,
+        {
+          type: NodeType.Divider,
+        },
+        {
+          value: '**✅ Assets in**',
+          type: NodeType.Text,
+          markdown: true,
+        },
+        ...DrawAssetsIn,
+        ...TxInsights(insights),
+        ...SimulateLinkToContractLibrary(contractLibraryUrl),
+      ],
+    },
+    severity: 'critical',
+  };
 };

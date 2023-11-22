@@ -16,7 +16,7 @@ export async function simulateTransaction(
   const { data, from, gas, to, value } = transaction;
 
   return await fetch(
-    `https://api.dedaub.com/api/transaction/${network}/simulate`,
+    `https://api.dedaub.com/api/transaction/${network}/simulate/snap`,
     {
       method: 'post',
       headers: {
