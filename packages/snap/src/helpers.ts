@@ -38,12 +38,6 @@ type TokenAmount = {
   value: string;
 };
 
-const roundToSmallestFirstTwoNonZeroDigits = (num: BigNumber) =>
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // eslint-disable-next-line require-unicode-regexp
-  num.toFixed(20).match(/^-?\d*\.?0*\d{0,2}/)[0];
-
 export const calcTokenAmounts = (
   hexTokenAmount: string,
   decimals: number,
@@ -57,13 +51,11 @@ export const calcTokenAmounts = (
     amount:
       adjustedAmount.toString() === 'NaN'
         ? 'N/A'
-        : roundToSmallestFirstTwoNonZeroDigits(adjustedAmount),
+        : adjustedAmount.toPrecision(2),
     value:
       adjustedAmount.toString() === 'NaN'
         ? 'N/A'
-        : roundToSmallestFirstTwoNonZeroDigits(
-            adjustedAmount.multipliedBy(lastPrice),
-          ),
+        : adjustedAmount.multipliedBy(lastPrice).toPrecision(2),
   };
 };
 
