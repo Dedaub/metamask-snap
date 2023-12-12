@@ -51,7 +51,6 @@ export const onTransaction: OnTransactionHandler = async ({
           },
         ],
       },
-      severity: 'critical',
     };
   }
 
@@ -194,6 +193,6 @@ export const onTransaction: OnTransactionHandler = async ({
         ...SimulateLinkToContractLibrary(contractLibraryUrl),
       ],
     },
-    severity: 'critical',
+    ...(payload.severity ? { severity: payload.severity } : {}),
   };
 };

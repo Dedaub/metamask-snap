@@ -20,4 +20,10 @@ export type SnapSimulateResponse = {
    * @memberof SnapSimulateResponse
    */
   insights: InsightsInner[];
+  /**
+   *
+   * @type {'critical' | null}
+   * @memberof SnapSimulateResponse
+   */
+  severity: 'critical' | null;
 };

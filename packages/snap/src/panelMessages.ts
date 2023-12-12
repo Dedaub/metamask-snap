@@ -11,7 +11,6 @@ export const NetworkNotSupportedPanel: OnTransactionResponse = {
       },
     ],
   },
-  severity: 'critical',
 };
 
 export const TxRevertedPanel = (errorMsg: string): OnTransactionResponse => ({

@@ -1,6 +1,6 @@
 {
   "name": "dedaub-metamask-snap",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
   "repository": {
     "type": "git",
