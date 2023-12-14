@@ -1,6 +1,6 @@
 {
   "name": "dedaub-metamask-snap",
-  "version": "0.1.8",
+  "version": "1.0.0",
   "description": "Security insights on detecting suspicious interactions.",
   "repository": {
     "type": "git",

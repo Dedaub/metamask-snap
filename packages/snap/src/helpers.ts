@@ -51,11 +51,11 @@ export const calcTokenAmounts = (
     amount:
       adjustedAmount.toString() === 'NaN'
         ? 'N/A'
-        : adjustedAmount.toPrecision(2),
+        : Number(adjustedAmount.toFixed(6)).toString(),
     value:
       adjustedAmount.toString() === 'NaN'
         ? 'N/A'
-        : adjustedAmount.multipliedBy(lastPrice).toPrecision(2),
+        : Number(adjustedAmount.multipliedBy(lastPrice).toFixed(2)).toString(),
   };
 };
 
