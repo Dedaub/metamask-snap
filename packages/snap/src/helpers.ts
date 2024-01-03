@@ -80,5 +80,5 @@ export const getContractLibrarySimulateUrl = (
       ?.toString()
       .slice(2)}`,
   );
-  return `https://library.dedaub.com/${network}/tx/0x0/simulate/0?query=${encodedData}`;
+  return `https://library.dedaub.com/${network}/tx/0x0/simulate/0?query=${encodedData}&utm_source=ms`;
 };

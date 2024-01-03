@@ -58,7 +58,7 @@ export const TxInsights = (insights: any[]): Component[] =>
     : [];
 
 export const SimulateLinkToContractLibrary = (url: string): Component[] =>
-  url.length < MAX_URL_CHARS_LENGTH
+  url.length < MAX_URL_CHARS_LENGTH - 13 // 13 is the length of the utm param added to the final url
     ? [
         {
           type: NodeType.Divider,
