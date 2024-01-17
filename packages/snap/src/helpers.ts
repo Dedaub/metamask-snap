@@ -72,13 +72,10 @@ export const getContractLibrarySimulateUrl = (
   network: string,
 ): string => {
   const { data, from, gas, to, value } = transaction;
-  const adjustedGas = data ? gas : '0x520C'; // TXs with empty data should have fixed gas to simulate
   const encodedData = lzString.compressToEncodedURIComponent(
     `d=${data?.toString().slice(2) || ''},f=${from?.toString().slice(2)},t=${to
       ?.toString()
-      .slice(2)},g=${adjustedGas?.toString().slice(2)},v=${value
-      ?.toString()
-      .slice(2)}`,
+      .slice(2)},g=${gas?.toString().slice(2)},v=${value?.toString().slice(2)}`,
   );
-  return `https://library.dedaub.com/${network}/tx/0x0/simulate/0?query=${encodedData}&utm_source=ms`;
+  return `https://app.dedaub.com/${network}/tx/0x0/simulate/0?query=${encodedData}&utm_source=ms`;
 };
