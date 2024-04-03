@@ -11,7 +11,7 @@ export const hasTxReverted = (
   }
 
   const childrenLength = traceNode?.children.length;
-  const lastChild = traceNode.children[childrenLength];
+  const lastChild = traceNode.children[childrenLength - 1];
   if (lastChild?.opcode === 'REVERT') {
     return { txReverted: true, txError: lastChild.error };
   }
