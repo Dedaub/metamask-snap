@@ -18,7 +18,7 @@ export type ParsedTransaction = {
    * @type {{ [key: string]: AddressMapInfo; }}
    * @memberof ParsedTransaction
    */
-  addressMap: {
+  address_map: {
     [key: string]: AddressMapInfo;
   };
   /**
@@ -26,7 +26,7 @@ export type ParsedTransaction = {
    * @type {TokenTransfer[]}
    * @memberof ParsedTransaction
    */
-  tokenTransfers: TokenTransfer[];
+  token_transfers: TokenTransfer[];
   /**
    *
    * @type {BalanceDelta[]}

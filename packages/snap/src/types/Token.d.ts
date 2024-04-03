@@ -92,4 +92,11 @@ export type TokenTransfer = {
    * @memberof TokenTransfer
    */
   amount: string;
+
+  /**
+   *
+   * @type {string}
+   * @memberof TokenTransfer
+   */
+  type: string;
 };
