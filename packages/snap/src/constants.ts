@@ -7,4 +7,5 @@ export const chainIdToNetwork = new Map<string, string>([
   ['43114', 'avalanche'],
   ['137', 'Polygon'],
   ['81457', 'blast'],
+  ['56', 'binance'],
 ]);
