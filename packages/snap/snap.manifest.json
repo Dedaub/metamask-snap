@@ -1,5 +1,5 @@
 {
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Security insights on detecting suspicious interactions.",
   "proposedName": "Dedaub",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/Dedaub/metamask-snap.git"
   },
   "source": {
-    "shasum": "P4fFWWP1Y8QKcI3XGM7ybg7/fn34Gk4jSYrAoXsoIYQ=",
+    "shasum": "8+4DZuIMeHUT5HGvSnVXNWQnEBOX2Sti/iBE349dB2E=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
